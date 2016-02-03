@@ -1,2 +1,2 @@
-# SpeekRecognition
+# Speech Recognition
 NTNU Cyborg
