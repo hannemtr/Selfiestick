@@ -1,2 +1,2 @@
-# Speech Recognition
+# Selfie stick
 NTNU Cyborg
