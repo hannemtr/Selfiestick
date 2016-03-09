@@ -7,15 +7,15 @@ from PIL import Image
 
 
 def takePicture(filename):
-	pygame.init()
+    pygame.init()
     pygame.camera.init()
     cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
     cam.start()
     img = cam.get_image()
     pygame.image.save(img, filename + '.bmp')
-	cam.stop()
-	pygame.camera.quit()
-	pygame.quit()
+    cam.stop()
+    pygame.camera.quit()
+    pygame.quit()
 
 
 def speak(str):
