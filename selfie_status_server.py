@@ -2,7 +2,7 @@
 import roslib; roslib.load_manifest('beginner_tutorials')
 from beginner_tutorials.srv import *
 import rospy
-import take_a_selfie as TAS
+import SelfieScript as TAS
 
 def handle_selfie_status(req):
 	if req.a == 1:
