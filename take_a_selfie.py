@@ -105,5 +105,5 @@ def main():
         question = 'I did not hear you, please repeat with yes or no.'
         answer = startListening(question, r, michrophone)
 
-main()
+#main()
 #img = takePicture("picture")
