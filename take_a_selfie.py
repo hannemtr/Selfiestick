@@ -92,9 +92,18 @@ def startListening(question, r, michrophone):
     print answer
     return answer
 
+def obtainMicrophone():
+    camera_mic = 'USB Device 0x46d:0x991:'
+    print(sr.Microphone().list_microphone_names())
+    mics = sr.Microphone().list_microphone_names()
+    for i in range(len(mics)):
+        if camera_mic in mics[i]:
+            return mics[i]
+    return sr.Microphone()
+
 def main():
     r = sr.Recognizer()
-    michrophone = sr.Microphone()
+    michrophone = obtainMicrophone()
     question = 'Would you like to take a selfie with me?'
     answer = startListening(question, r, michrophone)
     
