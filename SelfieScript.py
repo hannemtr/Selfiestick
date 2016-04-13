@@ -27,10 +27,14 @@ def speak(str):
     engine.runAndWait()
 
 def obtain_audio(r):
-    with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source)
-        audio = r.listen(source)
-        return audio
+    camera_mic = 'USB Device 0x46d:0x991:'
+    mics = sr.Microphone().list_microphone_names
+    for i in range(len(mics)):
+        if camera_mic in mics[i]:
+            with sr.Microphone(i) as source:
+            r.adjust_for_ambient_noise(source)
+            audio = r.listen(source)
+            return audio
 
 def check_for_yes_or_no(audio, r):
     try:
