@@ -16,9 +16,9 @@ def talker(speech, expression):
 def talk_random_expression(speech):
 	expr = ["happy", "angry", "smile", "sad", "disgust", "surprise", "fear", "suspicios",
 		"blink", "pain", "duckface"]
-	talker(speech, expr[random.randint(0, len(expr)-1)
+	talker(speech, expr[random.randint(0, len(expr)-1)])
 
-def talk_default_exxpression(speech):
+def talk_default_expression(speech):
 	talker(speech, "happy")
 
 if __name__ == '__main__':
