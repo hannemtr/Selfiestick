@@ -1,4 +1,4 @@
-#!/usr/bin/ev python
+#!/usr/bin/env python
 
 import rospy
 import random
