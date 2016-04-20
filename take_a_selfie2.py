@@ -7,6 +7,7 @@ from PIL import Image
 import threading
 import time
 #import facebookupload
+
 import talk_to_troll2
 
 answer_given = False
