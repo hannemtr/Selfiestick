@@ -29,6 +29,9 @@ def takePicture(filename):
 
 
 def speak(question, expression):
+    print ""
+    print question
+    print ""
     if useSpeaker:
         talk_to_troll2.talker(question, expression)
     else:
@@ -101,15 +104,17 @@ def startListening(question, expression, r, michrophone):
     return answer
 
 def obtainMicrophone():
+    #return sr.Microphone(0)
     camera_mic = 'USB Device 0x46d:0x991:'
     print(sr.Microphone().list_microphone_names())
     mics = sr.Microphone().list_microphone_names()
     for i in range(len(mics)):
         if camera_mic in mics[i]:
-            return mics[i]
+	    print i
+            return sr.Microphone(i)
     return sr.Microphone()
 
-def notHeard():
+def notHeard(r, michrophone):
     timesAsked = 1
     while not answer_given and timesAsked < 4:
         timesAsked += 1  
@@ -133,7 +138,7 @@ def main():
 
     answer = startListening(question, expression, r, michrophone)
     
-    notHeard()
+    notHeard(r, michrophone)
     
 
     if selfie_answer and answer_given:
@@ -145,7 +150,7 @@ def main():
         selfie = False
 
         answer = startListening(question, expression, r, michrophone)
-        notHeard()
+        notHeard(r, michrophone)
 
 
 main()
