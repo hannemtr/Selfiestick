@@ -3,14 +3,16 @@
 import rospy
 import random
 
-#from std_msgs.msg import String
-from trollnode.msg import Expression
-import sys
+try:
+	from trollnode.msg import Expression
+except:
+	pass
+	#from std_msgs.msg import String
 
-#question, expr = "", ""
 
 pub = ""
 def talker(speech, express):
+
     if express == "": express = talk_random_expression()
     #speak(speech, express)
 
@@ -43,5 +45,5 @@ def createPub():
         return True
     
         #talker(0)#rospy.myargv(argv=sys.argv)[0])
-    except rospy.ROSInterruptException:
+    except:
         return False
