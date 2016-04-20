@@ -5,16 +5,19 @@ import random
 from trollnode.msg import Expression
 
 def talker(speech, expression):
-	pub = rospy.Publisher('speaker', String, queue_size=10)
+	pub = rospy.Publisher('trollExpression', Expression, queue_size=10)
 	rospy.init_node('talker', anonymous=True)
-	#TODO fix .msg!!
-	expr_msg = Expression()
-	expr_msg.expression = expression
-	expr_msg.speech = speech
-	pub.publish(expr_msg)
+	rate = rospy.Rate(0.2) # 10hz
+	while not rospy.is_shutdown():
+		#TODO fix .msg!!
+		expr_msg = Expression()
+		expr_msg.expression = expression
+		expr_msg.speech = speech
+		pub.publish(expr_msg)
+		rate.sleep()
 
 def talk_random_expression(speech):
-	expr = ["happy", "angry", "smile", "sad", "disgust", "surprise", "fear", "suspicios",
+	expr = ["happy", "angry", "smile", "sad", "disgust", "surprise", "fear", "suspicious",
 		"blink", "pain", "duckface"]
 	talker(speech, expr[random.randint(0, len(expr)-1)])
 
@@ -23,7 +26,8 @@ def talk_default_expression(speech):
 
 if __name__ == '__main__':
 	try:
-		talker()
+		#talker("hello", "smile")
+		talk_random_expression("hello")
 	except rospy.ROSInterruptException:
 		pass
 
