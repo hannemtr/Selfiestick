@@ -13,6 +13,7 @@ import talk_to_troll2
 answer_given = False
 useSpeaker = False
 selfie = True # ask for selfie or ask for upload
+selfie_answer = False
 
 def takePicture(filename):
     pygame.init()
@@ -42,7 +43,7 @@ def obtain_audio(r, m):
         r.adjust_for_ambient_noise(source)
 
 def check_for_yes_or_no(r, audio):
-    global answer_given
+    global answer_given, selfie_answer
     try:
         recognized = r.recognize_google(audio, show_all=True)
         if len(recognized) == 0:
@@ -53,6 +54,7 @@ def check_for_yes_or_no(r, audio):
         for alternative in alternatives:
             if alternative['transcript'] == 'yes':
                 answer_given = True
+                selfie_answer = True
                 if selfie:
                     speak('Great, get behind the camera', "happy")
                     for _ in range(5): time.sleep(1)
@@ -98,13 +100,23 @@ def startListening(question, expression, r, michrophone):
     print answer
     return answer
 
-
+def obtainMicrophone():
+    camera_mic = 'USB Device 0x46d:0x991:'
+    print(sr.Microphone().list_microphone_names())
+    mics = sr.Microphone().list_microphone_names()
+    for i in range(len(mics)):
+        if camera_mic in mics[i]:
+            return mics[i]
+    return sr.Microphone()
 
 def main():
-    global useSpeaker
+    global useSpeaker, answer_given, selfie
 
     r = sr.Recognizer()
-    michrophone = sr.Microphone()
+    try:
+        michrophone = obtainMicrophone()
+    except:
+        michrophone = sr.Microphone()
     question = 'Would you like to take a selfie with me?'
     expression = "smile"
     useSpeaker = talk_to_troll2.createPub()
@@ -120,14 +132,18 @@ def main():
         expression = "surprise"
 
         answer = startListening(question, expression, r, michrophone)
-
-    if answer_given and answer:
+    
+    
+    if selfie_answer and answer_given:
+        answer_given = False
         question = 'Would you like me to upload it to my Facebook profile?'
         expression = "smile"
-        useSpeaker = talk_to_troll2.createPub()
+        #useSpeaker = talk_to_troll2.createPub()
+
         selfie = False
 
         answer = startListening(question, expression, r, michrophone)
+
         
 
         timesAsked = 1
@@ -140,4 +156,3 @@ def main():
 
 
 main()
-#img = takePicture("picture")
