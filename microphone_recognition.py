@@ -3,6 +3,7 @@
 # NOTE: this example requires PyAudio because it uses the Microphone class
 
 import speech_recognition as sr
+import tts
 
 def obtain_audio(r):
     with sr.Microphone() as source:
@@ -26,7 +27,7 @@ def check_for_yes_or_no(audio, r):
 
 def main():
     r = sr.Recognizer()
-    print('Would you like to take a selfie with me?')
+    tts.askForSelfie()
     audio = obtain_audio(r)
     answer = check_for_yes_or_no(audio, r)
     while answer == None:

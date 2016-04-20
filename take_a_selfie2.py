@@ -12,6 +12,8 @@ import talk_to_troll2
 
 answer_given = False
 useSpeaker = False
+selfie = True # ask for selfie or ask for upload
+
 def takePicture(filename):
     pygame.init()
     pygame.camera.init()
@@ -51,21 +53,26 @@ def check_for_yes_or_no(r, audio):
         for alternative in alternatives:
             if alternative['transcript'] == 'yes':
                 answer_given = True
-                speak('Great, get behind the camera', "happy")
-                for _ in range(5): time.sleep(1)
-                speak('3', "smile")
-                time.sleep(0.5)
-                speak('2', "smile")
-                time.sleep(0.5)
-                speak('1', "smile")
-                time.sleep(0.5)
-                speak('Taking selfie...', talk_to_troll2.talk_random_expression())
-                img = takePicture("picture")
-                speak('Thank you, I have uploaded it to my facebook profile', "blink")
+                if selfie:
+                    speak('Great, get behind the camera', "happy")
+                    for _ in range(5): time.sleep(1)
+                    speak('3', "smile")
+                    time.sleep(0.5)
+                    speak('2', "smile")
+                    time.sleep(0.5)
+                    speak('1', "smile")
+                    time.sleep(0.5)
+                    speak('Taking selfie...', talk_to_troll2.talk_random_expression())
+                    img = takePicture("picture")
+                else:
+                    speak('Thank you, picture uploaded', "blink")
                 return True
             if alternative['transcript'] == 'no':
                 answer_given = True
-                speak('No selfie taken...', "sad")
+                if selfie:
+                    speak('No selfie taken...', "sad")
+                else:
+                    speak('No picture uploaded. Thank you anyway!', "smile")
                 return False
     except sr.UnknownValueError:
         return None
@@ -113,6 +120,23 @@ def main():
         expression = "surprise"
 
         answer = startListening(question, expression, r, michrophone)
+
+    if answer_given and answer:
+        question = 'Would you like me to upload it to my Facebook profile?'
+        expression = "smile"
+        useSpeaker = talk_to_troll2.createPub()
+        selfie = False
+
+        answer = startListening(question, expression, r, michrophone)
+        
+
+        timesAsked = 1
+        while not answer_given and timesAsked < 4:
+            timesAsked += 1  
+            question = 'I did not hear you, please repeat with yes or no.'
+            expression = "surprise"
+
+            answer = startListening(question, expression, r, michrophone)
 
 
 main()
