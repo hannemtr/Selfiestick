@@ -109,6 +109,15 @@ def obtainMicrophone():
             return mics[i]
     return sr.Microphone()
 
+def notHeard():
+    timesAsked = 1
+    while not answer_given and timesAsked < 4:
+        timesAsked += 1  
+        question = 'I did not hear you, please repeat with yes or no.'
+        expression = "surprise"
+
+        answer = startListening(question, expression, r, michrophone)
+
 def main():
     global useSpeaker, answer_given, selfie
 
@@ -124,16 +133,9 @@ def main():
 
     answer = startListening(question, expression, r, michrophone)
     
-
-    timesAsked = 1
-    while not answer_given and timesAsked < 4:
-        timesAsked += 1  
-        question = 'I did not hear you, please repeat with yes or no.'
-        expression = "surprise"
-
-        answer = startListening(question, expression, r, michrophone)
+    notHeard()
     
-    
+
     if selfie_answer and answer_given:
         answer_given = False
         question = 'Would you like me to upload it to my Facebook profile?'
@@ -143,16 +145,7 @@ def main():
         selfie = False
 
         answer = startListening(question, expression, r, michrophone)
-
-        
-
-        timesAsked = 1
-        while not answer_given and timesAsked < 4:
-            timesAsked += 1  
-            question = 'I did not hear you, please repeat with yes or no.'
-            expression = "surprise"
-
-            answer = startListening(question, expression, r, michrophone)
+        notHeard()
 
 
 main()
