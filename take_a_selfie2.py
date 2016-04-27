@@ -6,7 +6,7 @@ import speech_recognition as sr
 from PIL import Image
 import threading
 import time
-#import facebookupload
+import facebookupload
 
 import talk_to_troll2
 
@@ -16,22 +16,24 @@ selfie = True # ask for selfie or ask for upload
 selfie_answer = False
 
 def takePicture(filename):
-    pygame.init()
     pygame.camera.init()
-    cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
+    cam = pygame.camera.Camera(pygame.camera.list_cameras()[1])
+    
+    speak('Taking selfie...', talk_to_troll2.talk_random_expression())
     cam.start()
     img = cam.get_image()
+
     pygame.image.save(img, filename + '.bmp')
     cam.stop()
     pygame.camera.quit()
     pygame.quit()
+
+    time.sleep(0.3)
     return filename + '.bmp'
 
 
 def speak(question, expression):
-    print ""
-    print question
-    print ""
+    print(question)
     if useSpeaker:
         talk_to_troll2.talker(question, expression)
     else:
@@ -60,15 +62,26 @@ def check_for_yes_or_no(r, audio):
                 selfie_answer = True
                 if selfie:
                     speak('Great, get behind the camera', "happy")
-                    for _ in range(5): time.sleep(1)
+                    try:
+                        arm = arduinoscript.Arm()
+                        arm.connect()
+                        arm.raiseArm()
+                        arm.waitForArm()
+                    except:
+                        pass
+                    for _ in range(3): time.sleep(1)
                     speak('3', "smile")
-                    time.sleep(0.5)
+                    time.sleep(0.8)
                     speak('2', "smile")
-                    time.sleep(0.5)
+                    time.sleep(0.8)
                     speak('1', "smile")
-                    time.sleep(0.5)
-                    speak('Taking selfie...', talk_to_troll2.talk_random_expression())
+                    #time.sleep(0.5)
                     img = takePicture("picture")
+                    facebookupload.uploadPicture(img)
+                    try:
+                        arm.lowerArm()
+                    except:
+                        pass
                 else:
                     speak('Thank you, picture uploaded', "blink")
                 return True
