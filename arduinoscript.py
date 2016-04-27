@@ -85,10 +85,12 @@ class Arm(Thread):
 
 	def waitForArm(self):
 		while True:
-			if self.wait_flag:
+			output = self.ser.read(128)
+			if "b" in output:
+			#if self.wait_flag:
 				self.wait_flag = 0
-				return True
+				break
 
-if __name__ == "__main__":
-	arm = Arm()
-	arm.run()
+#if __name__ == "__main__":
+#	arm = Arm()
+#	arm.run()
