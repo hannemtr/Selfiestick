@@ -15,6 +15,7 @@ answer_given = False
 useSpeaker = False
 selfie = True # ask for selfie or ask for upload
 selfie_answer = False
+picturename = "picture.bmp"
 
 def takePicture(filename):
     pygame.camera.init()
@@ -24,13 +25,13 @@ def takePicture(filename):
     cam.start()
     img = cam.get_image()
 
-    pygame.image.save(img, filename + '.bmp')
+    pygame.image.save(img, picturename)
     cam.stop()
     pygame.camera.quit()
     pygame.quit()
 
     time.sleep(0.3)
-    return filename + '.bmp'
+    return picturename
 
 
 def speak(question, expression):
@@ -78,12 +79,12 @@ def check_for_yes_or_no(r, audio):
                     speak('1', "smile")
                     #time.sleep(0.5)
                     img = takePicture("picture")
-                    facebookupload.uploadPicture(img)
                     try:
                         arm.lowerArm()
                     except:
                         pass
                 else:
+                    facebookupload.uploadPicture(picturename)
                     speak('Thank you, picture uploaded', "blink")
                 return True
             if alternative['transcript'] == 'no':
