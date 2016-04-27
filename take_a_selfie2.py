@@ -9,6 +9,7 @@ import time
 import facebookupload
 
 import talk_to_troll2
+import arduinoscript
 
 answer_given = False
 useSpeaker = False
