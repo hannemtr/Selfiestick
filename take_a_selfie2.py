@@ -19,7 +19,7 @@ picturename = "picture.bmp"
 
 def takePicture(filename):
     pygame.camera.init()
-    cam = pygame.camera.Camera(pygame.camera.list_cameras()[1])
+    cam = pygame.camera.Camera(pygame.camera.list_cameras()[1], (640,480))
     
     speak('Taking selfie...', talk_to_troll2.talk_random_expression())
     cam.start()
