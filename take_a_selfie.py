@@ -8,7 +8,7 @@ import threading
 import time
 import facebookupload
 
-import talk_to_troll2
+import talk_to_troll
 import arduinoscript
 
 answer_given = False
@@ -19,7 +19,7 @@ picturename = "picture.bmp"
 
 def takePicture(filename):
     pygame.camera.init()
-    cam = pygame.camera.Camera(pygame.camera.list_cameras()[1], (640,480))
+    cam = pygame.camera.Camera(pygame.camera.list_cameras()[0], (640,480))
     
     speak('Taking selfie...', talk_to_troll2.talk_random_expression())
     cam.start()
@@ -125,7 +125,6 @@ def obtainMicrophone():
     mics = sr.Microphone().list_microphone_names()
     for i in range(len(mics)):
         if camera_mic in mics[i]:
-	    print i
             return sr.Microphone(i)
     return sr.Microphone()
 
