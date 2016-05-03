@@ -8,36 +8,49 @@ import threading
 import time
 import facebookupload
 
+import talk_to_troll2
+import arduinoscript
+
 answer_given = False
+useSpeaker = False
+selfie = True # ask for selfie or ask for upload
+selfie_answer = False
+picturename = "picture.bmp"
+
 def takePicture(filename):
-    pygame.init()
     pygame.camera.init()
-    cam = pygame.camera.Camera(pygame.camera.list_cameras()[0])
+    cam = pygame.camera.Camera(pygame.camera.list_cameras()[1], (640,480))
+    
+    speak('Taking selfie...', talk_to_troll2.talk_random_expression())
     cam.start()
     img = cam.get_image()
-    pygame.image.save(img, filename + '.bmp')
+
+    pygame.image.save(img, picturename)
     cam.stop()
     pygame.camera.quit()
     pygame.quit()
-    return filename + '.bmp'
+
+    time.sleep(0.3)
+    return picturename
 
 
-def speak(str):
-    print(str)
-    engine = pyttsx.init()
-    rate = engine.getProperty('rate')
-    engine.setProperty('rate', rate + 0.5)
-    engine.say(str)
-    engine.runAndWait()
+def speak(question, expression):
+    print(question)
+    if useSpeaker:
+        talk_to_troll2.talker(question, expression)
+    else:
+        engine = pyttsx.init()
+        rate = engine.getProperty('rate')
+        engine.setProperty('rate', rate + 0.5)
+        engine.say(question)
+        engine.runAndWait()
 
 def obtain_audio(r, m):
     with m as source:
         r.adjust_for_ambient_noise(source)
-        #audio = r.listen(source)
-        #return audio
 
 def check_for_yes_or_no(r, audio):
-    global answer_given
+    global answer_given, selfie_answer
     try:
         recognized = r.recognize_google(audio, show_all=True)
         if len(recognized) == 0:
@@ -48,23 +61,38 @@ def check_for_yes_or_no(r, audio):
         for alternative in alternatives:
             if alternative['transcript'] == 'yes':
                 answer_given = True
-                speak('Great, get behind the camera')
-                for _ in range(5): time.sleep(1)
-                speak('3')
-                time.sleep(0.5)
-                speak('2')
-                time.sleep(0.5)
-                speak('1')
-                time.sleep(0.5)
-                speak('Taking selfie...')
-                img = takePicture("picture")
-                #facebookupload.uploadPicture(img)
-                speak('Thank you, I have uploaded it to my facebook profile')
+                selfie_answer = True
+                if selfie:
+                    speak('Great, get behind the camera', "happy")
+                    try:
+                        arm = arduinoscript.Arm()
+                        arm.connect()
+                        arm.raiseArm()
+                        arm.waitForArm()
+                    except:
+                        pass
+                    for _ in range(3): time.sleep(1)
+                    speak('3', "smile")
+                    time.sleep(0.8)
+                    speak('2', "smile")
+                    time.sleep(0.8)
+                    speak('1', "smile")
+                    #time.sleep(0.5)
+                    img = takePicture("picture")
+                    try:
+                        arm.lowerArm()
+                    except:
+                        pass
+                else:
+                    facebookupload.uploadPicture(picturename)
+                    speak('Thank you, picture uploaded', "blink")
                 return True
             if alternative['transcript'] == 'no':
                 answer_given = True
-                speak('No selfie taken... sadface')
-                #Image.open('picture.bmp').show()
+                if selfie:
+                    speak('No selfie taken...', "sad")
+                else:
+                    speak('No picture uploaded. Thank you anyway!', "smile")
                 return False
     except sr.UnknownValueError:
         return None
@@ -72,18 +100,16 @@ def check_for_yes_or_no(r, audio):
         return None
 
 
-def startListening(question, r, michrophone):
+def startListening(question, expression, r, michrophone):
     audio = obtain_audio(r, michrophone)
     stop_listening = r.listen_in_background(michrophone, check_for_yes_or_no)
-    #question = 'Would you like to take a selfie with me?'
     
-    #speak(question)
     try:
-        thread1 = threading.Thread(target = speak, args=(question,))
+        thread1 = threading.Thread(target = speak, args=(question, expression))
         thread1.start()
     except:
         print "failed"
-        speak(question)
+        speak(question, expression)
 
     for _ in range(200):
         if answer_given: break;
@@ -93,26 +119,53 @@ def startListening(question, r, michrophone):
     return answer
 
 def obtainMicrophone():
+    #return sr.Microphone(0)
     camera_mic = 'USB Device 0x46d:0x991:'
     print(sr.Microphone().list_microphone_names())
     mics = sr.Microphone().list_microphone_names()
     for i in range(len(mics)):
         if camera_mic in mics[i]:
-            return mics[i]
+	    print i
+            return sr.Microphone(i)
     return sr.Microphone()
 
-def main():
-    r = sr.Recognizer()
-    michrophone = obtainMicrophone()
-    question = 'Would you like to take a selfie with me?'
-    answer = startListening(question, r, michrophone)
-    
-
+def notHeard(r, michrophone):
     timesAsked = 1
     while not answer_given and timesAsked < 4:
         timesAsked += 1  
         question = 'I did not hear you, please repeat with yes or no.'
-        answer = startListening(question, r, michrophone)
+        expression = "surprise"
 
-#main()
-#img = takePicture("picture")
+        answer = startListening(question, expression, r, michrophone)
+
+def main():
+    global useSpeaker, answer_given, selfie
+
+    r = sr.Recognizer()
+    try:
+        michrophone = obtainMicrophone()
+    except:
+        michrophone = sr.Microphone()
+    question = 'Would you like to take a selfie with me?'
+    expression = "smile"
+    useSpeaker = talk_to_troll2.createPub()
+
+
+    answer = startListening(question, expression, r, michrophone)
+    
+    notHeard(r, michrophone)
+    
+
+    if selfie_answer and answer_given:
+        answer_given = False
+        question = 'Would you like me to upload it to my Facebook profile?'
+        expression = "smile"
+        #useSpeaker = talk_to_troll2.createPub()
+
+        selfie = False
+
+        answer = startListening(question, expression, r, michrophone)
+        notHeard(r, michrophone)
+
+
+main()
